@@ -12,6 +12,10 @@ import (
 type AuthService interface {
 	Register(user *model.User) error
 	Login(email, password string) (*model.User, error)
+	UpdateUser(user *model.User) error
+	GetUserByID(id uint) (*model.User, error)
+	GetUserByPublicID(publicId string) (*model.User, error)
+	GetAllUser(search, sort string, limit, offset int) ([]model.User, int64, error)
 }
 
 type authService struct {
@@ -52,4 +56,20 @@ func (service *authService) Login(email, password string) (*model.User, error) {
 	}
 
 	return findUser, nil
+}
+
+func (service *authService) UpdateUser(user *model.User) error {
+	return service.repo.Update(user)
+}
+
+func (service *authService) GetUserByID(id uint) (*model.User, error) {
+	return service.repo.FindByID(id)
+}
+
+func (service *authService) GetUserByPublicID(publicId string) (*model.User, error) {
+	return service.repo.FindByPublicID(publicId)
+}
+
+func (service *authService) GetAllUser(search, sort string, limit, offset int) ([]model.User, int64, error) {
+	return service.repo.FindAll(search, sort, limit, offset)
 }
