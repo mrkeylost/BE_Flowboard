@@ -11,17 +11,24 @@ import (
 	"github.com/mrkeylost/Flowboard_Backend/utils"
 )
 
-func Setup(app *fiber.App, authController *controller.AuthController) {
+func Setup(
+	app *fiber.App,
+	authController *controller.AuthController,
+	boardController *controller.BoardController,
+) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error load env value")
 	}
 
-	public := app.Group("/api/auth")
-	public.Post("/register", authController.Register)
-	public.Post("/login", authController.Login)
+	public := app.Group("/api")
 
-	protected := app.Group("/api/auth", jwtware.New(jwtware.Config{
+	// Authentication Public Route
+	publicUser := public.Group("/auth")
+	publicUser.Post("/register", authController.Register)
+	publicUser.Post("/login", authController.Login)
+
+	protected := app.Group("/api", jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{
 			Key: []byte(config.AppConfig.JWTSecret),
 		},
@@ -30,8 +37,16 @@ func Setup(app *fiber.App, authController *controller.AuthController) {
 		},
 	}))
 
-	protected.Get("/", authController.GetAllUser)
-	protected.Get("/:id", authController.GetUserDetail)
-	protected.Put("/:id", authController.UpdateUser)
-	protected.Delete("/:id", authController.DeleteUser)
+	// Authentication Protected Route
+	protectedUser := protected.Group("/auth")
+	protectedUser.Get("/", authController.GetAllUser)
+	protectedUser.Get("/:id", authController.GetUserDetail)
+	protectedUser.Put("/:id", authController.UpdateUser)
+	protectedUser.Delete("/:id", authController.DeleteUser)
+
+	// Board Protected Route
+	protectedBoard := protected.Group("/board")
+	protectedBoard.Post("/", boardController.CreateBoard)
+	protectedBoard.Post("/:id/members", boardController.AddBoardMembers)
+	protectedBoard.Put("/:id", boardController.UpdateBoard)
 }

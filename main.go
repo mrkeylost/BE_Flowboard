@@ -20,11 +20,20 @@ func main() {
 
 	app := fiber.New()
 
+	// Auth Instance
 	userRepo := repository.NewUserRepository()
 	userService := services.NewUserService(userRepo)
 	userController := controller.NewUserController(userService)
 
-	route.Setup(app, userController)
+	// Board Member Instance
+	boardMemberRepo := repository.NewBoardMemberRepository()
+
+	// Board Instance
+	boardRepo := repository.NewBoardRepository()
+	boardService := services.NewBoardService(boardRepo, userRepo, boardMemberRepo)
+	boardController := controller.NewBoardController(boardService)
+
+	route.Setup(app, userController, boardController)
 
 	PORT := config.AppConfig.Port
 	log.Println("Listening server on port :", PORT)
