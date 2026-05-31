@@ -10,6 +10,7 @@ import (
 type AuthRepository interface {
 	Create(user *model.User) error
 	Update(user *model.User) error
+	Delete(id uint) error
 	FindByEmail(email string) (*model.User, error)
 	FindByID(id uint) (*model.User, error)
 	FindByPublicID(publiCId string) (*model.User, error)
@@ -31,6 +32,10 @@ func (repo *authRepository) Update(user *model.User) error {
 	return config.DBConn.Model(&model.User{}).Where("public_id = ?", user.PublicID).Updates(map[string]interface{}{
 		"name": user.Name,
 	}).Error
+}
+
+func (repo *authRepository) Delete(id uint) error {
+	return config.DBConn.Delete(&model.User{}, id).Error
 }
 
 func (repo *authRepository) FindByEmail(email string) (*model.User, error) {

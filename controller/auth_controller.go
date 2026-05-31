@@ -98,6 +98,15 @@ func (controller *AuthController) UpdateUser(ctx fiber.Ctx) error {
 	return utils.Success(ctx, "Update user data success", userResponse)
 }
 
+func (controller *AuthController) DeleteUser(ctx fiber.Ctx) error {
+	id, _ := strconv.Atoi(ctx.Params("id"))
+	if err := controller.service.DeleteUser(uint(id)); err != nil {
+		return utils.InternalServerError(ctx, "Delete user data failed", err.Error())
+	}
+
+	return utils.Success(ctx, "Delete user success", id)
+}
+
 func (controller *AuthController) GetUserDetail(ctx fiber.Ctx) error {
 	id := ctx.Params("id")
 

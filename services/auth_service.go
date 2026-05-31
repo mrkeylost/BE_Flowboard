@@ -13,6 +13,7 @@ type AuthService interface {
 	Register(user *model.User) error
 	Login(email, password string) (*model.User, error)
 	UpdateUser(user *model.User) error
+	DeleteUser(id uint) error
 	GetUserByID(id uint) (*model.User, error)
 	GetUserByPublicID(publicId string) (*model.User, error)
 	GetAllUser(search, sort string, limit, offset int) ([]model.User, int64, error)
@@ -60,6 +61,10 @@ func (service *authService) Login(email, password string) (*model.User, error) {
 
 func (service *authService) UpdateUser(user *model.User) error {
 	return service.repo.Update(user)
+}
+
+func (service *authService) DeleteUser(id uint) error {
+	return service.repo.Delete(id)
 }
 
 func (service *authService) GetUserByID(id uint) (*model.User, error) {

@@ -33,4 +33,5 @@ func Setup(app *fiber.App, authController *controller.AuthController) {
 	protected.Get("/", authController.GetAllUser)
 	protected.Get("/:id", authController.GetUserDetail)
 	protected.Put("/:id", authController.UpdateUser)
+	protected.Delete("/:id", authController.DeleteUser)
 }
