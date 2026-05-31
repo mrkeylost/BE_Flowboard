@@ -46,7 +46,9 @@ func Setup(
 
 	// Board Protected Route
 	protectedBoard := protected.Group("/board")
+	protectedBoard.Get("/my-board", boardController.GetAllBoardByUserID)
 	protectedBoard.Post("/", boardController.CreateBoard)
-	protectedBoard.Post("/:id/members", boardController.AddBoardMembers)
 	protectedBoard.Put("/:id", boardController.UpdateBoard)
+	protectedBoard.Post("/:id/members", boardController.AddBoardMembers)
+	protectedBoard.Delete("/:id/members", boardController.RemoveBoardMembers)
 }

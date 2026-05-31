@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"math"
+	"strconv"
+
 	jwtware "github.com/gofiber/contrib/v3/jwt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
@@ -71,6 +74,39 @@ func (controller *BoardController) UpdateBoard(ctx fiber.Ctx) error {
 	return utils.Success(ctx, "Update board success", board)
 }
 
+func (controller *BoardController) GetAllBoardByUserID(ctx fiber.Ctx) error {
+	user := jwtware.FromContext(ctx)
+	claims := user.Claims.(jwt.MapClaims)
+	userID := claims["public_id"].(string)
+
+	page, _ := strconv.Atoi(ctx.Query("page", "1"))
+	limit, _ := strconv.Atoi(ctx.Query("limit", "10"))
+	offset := (page - 1) * limit
+
+	search := ctx.Query("search", "")
+	sort := ctx.Query("sort", "")
+
+	boards, total, err := controller.service.FindBoardByUserID(userID, search, sort, limit, offset)
+	if err != nil {
+		return utils.InternalServerError(ctx, "Board data not found", err.Error())
+	}
+
+	meta := utils.PaginationMeta{
+		Page:      page,
+		Limit:     limit,
+		Total:     int(total),
+		TotalPage: int(math.Ceil(float64(total) / float64(limit))),
+		Search:    search,
+		Sort:      sort,
+	}
+
+	if total == 0 {
+		return utils.PaginationNotFound(ctx, "Board data not found", boards, meta)
+	}
+
+	return utils.PaginationSuccess(ctx, "Get board data success", boards, meta)
+}
+
 func (controller *BoardController) AddBoardMembers(ctx fiber.Ctx) error {
 	publicID := ctx.Params("id")
 
@@ -84,4 +120,19 @@ func (controller *BoardController) AddBoardMembers(ctx fiber.Ctx) error {
 	}
 
 	return utils.Success(ctx, "Add board member success", nil)
+}
+
+func (controller *BoardController) RemoveBoardMembers(ctx fiber.Ctx) error {
+	publicID := ctx.Params("id")
+
+	var userIDs []string
+	if err := ctx.Bind().Body(&userIDs); err != nil {
+		return utils.BadRequest(ctx, "Parsing data failed", err.Error())
+	}
+
+	if err := controller.service.RemoveBoardMember(publicID, userIDs); err != nil {
+		return utils.BadRequest(ctx, "Remove board member failed", err.Error())
+	}
+
+	return utils.Success(ctx, "Remove board member success", nil)
 }
