@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type TableList struct {
+type List struct {
 	InternalID      int64     `json:"internal_id" db:"internal_id" gorm:"primaryKey"`
 	PublicID        uuid.UUID `json:"public_id" db:"public_id"`
 	Title           string    `json:"title" db:"title"`

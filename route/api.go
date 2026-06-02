@@ -15,6 +15,7 @@ func Setup(
 	app *fiber.App,
 	authController *controller.AuthController,
 	boardController *controller.BoardController,
+	listController *controller.ListController,
 ) {
 	err := godotenv.Load()
 	if err != nil {
@@ -51,4 +52,8 @@ func Setup(
 	protectedBoard.Put("/:id", boardController.UpdateBoard)
 	protectedBoard.Post("/:id/members", boardController.AddBoardMembers)
 	protectedBoard.Delete("/:id/members", boardController.RemoveBoardMembers)
+
+	// List Protected Route
+	protectedList := protected.Group("/list")
+	protectedList.Post("/", listController.CreateList)
 }
