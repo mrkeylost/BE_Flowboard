@@ -94,3 +94,33 @@ func (controller *ListController) GetListOnBoard(ctx fiber.Ctx) error {
 
 	return utils.Success(ctx, "Get list success", orderedList)
 }
+
+func (controller *ListController) UpdateListPositionOnBoard(ctx fiber.Ctx) error {
+	boardPublicID := ctx.Params("id")
+	if _, err := uuid.Parse(boardPublicID); err != nil {
+		return utils.BadRequest(ctx, "Invalid ID", err.Error())
+	}
+
+	var positionUUID []uuid.UUID
+	if err := ctx.Bind().Body(&positionUUID); err != nil {
+		var positionString []string
+		if err := ctx.Bind().Body(&positionString); err != nil {
+			return utils.BadRequest(ctx, "Invalid position", err.Error())
+		}
+
+		for _, pos := range positionString {
+			uuidPos, err := uuid.Parse(pos)
+			if err != nil {
+				return utils.BadRequest(ctx, "Invalid position", err.Error())
+			}
+
+			positionUUID = append(positionUUID, uuidPos)
+		}
+	}
+
+	if err := controller.service.UpdatePositions(boardPublicID, positionUUID); err != nil {
+		return utils.InternalServerError(ctx, "Update list position failed", err.Error())
+	}
+
+	return utils.Success(ctx, "Update list position success", nil)
+}
