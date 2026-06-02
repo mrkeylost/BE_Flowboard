@@ -120,6 +120,10 @@ func (service *listService) GetListByBoard(boardPublicID string) (*ListWithOrder
 		return nil, errors.New("List order not found: " + err.Error())
 	}
 
+	if len(positions) == 0 {
+		return nil, errors.New("list position not found")
+	}
+
 	findList, err := service.listRepo.FindByBoard(boardPublicID)
 	if err != nil {
 		return nil, errors.New("List not found: " + err.Error())

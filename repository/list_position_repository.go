@@ -22,8 +22,10 @@ func NewListPositionRepository() ListPositionRepository {
 func (repo *listPositionRepository) GetByBoard(boardPublicID string) (*model.ListPosition, error) {
 	var position model.ListPosition
 
-	err := config.DBConn.Joins("JOIN list_positions lp ON lp.board_internal_id = boards.internal_id").
-		Where("boards.public_id = ?", boardPublicID).
+	err := config.DBConn.Table("list_positions lp").
+		Joins("JOIN boards b ON lp.board_internal_id = b.internal_id").
+		Where("b.public_id = ?", boardPublicID).
+		First(&position).
 		Error
 
 	return &position, err

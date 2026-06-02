@@ -52,8 +52,11 @@ func Setup(
 	protectedBoard.Put("/:id", boardController.UpdateBoard)
 	protectedBoard.Post("/:id/members", boardController.AddBoardMembers)
 	protectedBoard.Delete("/:id/members", boardController.RemoveBoardMembers)
+	protectedBoard.Get("/:id/lists", listController.GetListOnBoard)
 
 	// List Protected Route
 	protectedList := protected.Group("/list")
 	protectedList.Post("/", listController.CreateList)
+	protectedList.Put("/:id", listController.UpdateList)
+	protectedList.Delete("/:id", listController.DeleteList)
 }

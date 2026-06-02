@@ -19,7 +19,8 @@ func (repo *boardMemberRepository) GetMember(boardPublicID string) ([]model.User
 	var users []model.User
 
 	err := config.DBConn.
-		Joins("JOIN board_members bm ON bm.user_internal_id = users.internal_id").
+		Table("users u").
+		Joins("JOIN board_members bm ON bm.user_internal_id = u.internal_id").
 		Joins("JOIN boards b ON b.internal_id = bm.board_internal_id").
 		Where("b.public_id = ?", boardPublicID).
 		Find(&users).

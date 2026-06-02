@@ -6,6 +6,10 @@ import (
 )
 
 func SortListByPos(list []model.List, order []uuid.UUID) []model.List {
+	if len(order) == 0 {
+		return list
+	}
+
 	ordered := make([]model.List, 0, len(order))
 
 	listMap := make(map[uuid.UUID]model.List)
